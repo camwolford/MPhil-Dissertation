@@ -145,12 +145,13 @@ for (snp in HBA1C_snp_counts$HBA1C_SNPs) {
 }
 
 
-# Save the superpathway_counts, subpathway_counts, T2DM_snp_counts, FG_snp_counts, HBA1C_snp_counts
+# Save the superpathway_counts, subpathway_counts, T2DM_snp_counts, FG_snp_counts, HBA1C_snp_counts and significant_metabolites_data dataframes as TSV files
 write_tsv(superpathway_counts, "superpathway_counts.tsv")
 write_tsv(subpathway_counts, "subpathway_counts.tsv")
 write_tsv(T2DM_snp_counts, "T2DM_snp_counts.tsv")
 write_tsv(FG_snp_counts, "FG_snp_counts.tsv")
 write_tsv(HBA1C_snp_counts, "HBA1C_snp_counts.tsv")
+write_tsv(sig_metabolites_data, "significant_metabolites_data.tsv")
 
 # Plot the distribution of the number of metabolites associated with each SNP
 ggplot(T2DM_snp_counts, aes(n)) +
