@@ -1,5 +1,6 @@
 library(ggplot2)
 library(TwoSampleMR)
+library(dplyr)
 
 # Read in the T2DM_MR_Results.tsv file
 t2dm_mr_results <- read.table("T2DM_MR_Results.tsv", header = TRUE, sep = "\t")
@@ -8,17 +9,6 @@ responses_combined <- read.table("responses_combined.tsv", header = TRUE, sep = 
 
 # In a new data frame, collect the metabolite names, Fixed_IVW_Estimate, and Fixed_IVW_Pval columns
 t2dm_mr_results_subset <- t2dm_mr_results[, c("Metabolite", "Fixed_IVW_Estimate", "Fixed_IVW_Pval", "Number_of_IVs", "Random_IVW_Pval")]
-# Get the correct metabolite names by fuzzy matching from responses_combined$name
-t2dm_mr_results_subset$Correct_Names <- sapply(t2dm_mr_results_subset$Metabolite, function(x) {
-  # Find the closest match in responses_combined$name
-  closest_match <- agrepl(x, responses_combined$name, ignore.case = TRUE)
-  # If there is a match, return the correct name, otherwise return NA
-  if (any(closest_match)) {
-    return(responses_combined$name[closest_match][1])
-  } else {
-    return(NA)
-  }
-})
 
 # Correcting the setup for top_significant calculation
 t2dm_mr_results_subset$logp <- -log10(ifelse(t2dm_mr_results_subset$Number_of_IVs <= 3, 
@@ -44,7 +34,7 @@ volcano_plot <- ggplot(t2dm_mr_results_subset, aes(x = Fixed_IVW_Estimate, y = l
   geom_hline(yintercept = -log10(3.06e-5), linetype = "dashed", color = "black")
 # Adding labels only to the top significant metabolites, corrected placement and usage of aesthetics
 volcano_plot <- volcano_plot + 
-  geom_text(aes(label = ifelse(top_significant, as.character(t2dm_mr_results_subset$Correct_Names), ""), color = color),
+  geom_text(aes(label = ifelse(top_significant, as.character(t2dm_mr_results_subset$Metabolite), ""), color = color),
             vjust = 1.5, hjust = 0.5, size = 3.5, check_overlap = TRUE)
 # Print the plot
 print(volcano_plot)
@@ -60,17 +50,6 @@ fg_mr_results <- read.table("FG_MR_Results.tsv", header = TRUE, sep = "\t")
 
 # In a new data frame, collect the metabolite names, Fixed_IVW_Estimate, and Fixed_IVW_Pval columns
 fg_mr_results_subset <- fg_mr_results[, c("Metabolite", "Fixed_IVW_Estimate", "Fixed_IVW_Pval", "Number_of_IVs", "Random_IVW_Pval")]
-# Get the correct metabolite names by fuzzy matching from responses_combined$name
-fg_mr_results_subset$Correct_Names <- sapply(fg_mr_results_subset$Metabolite, function(x) {
-  # Find the closest match in responses_combined$name
-  closest_match <- agrepl(x, responses_combined$name, ignore.case = TRUE)
-  # If there is a match, return the correct name, otherwise return NA
-  if (any(closest_match)) {
-    return(responses_combined$name[closest_match][1])
-  } else {
-    return(NA)
-  }
-})
 
 # Correcting the setup for top_significant calculation 
 fg_mr_results_subset$logp <- -log10(ifelse(fg_mr_results_subset$Number_of_IVs <= 3, 
@@ -97,7 +76,7 @@ volcano_plot <- ggplot(fg_mr_results_subset, aes(x = Fixed_IVW_Estimate, y = log
 # Adding labels only to the top significant metabolites, corrected placement and usage of aesthetics
 volcano_plot <- volcano_plot + 
   geom_text(data = fg_mr_results_subset[fg_mr_results_subset$top_significant, ],
-            aes(label = Correct_Names, color = color),
+            aes(label = Metabolite, color = color),
             vjust = 1.5, hjust = 0.5, size = 3.5, check_overlap = TRUE)
 # Print the plot
 print(volcano_plot)
@@ -112,17 +91,6 @@ hba1c_mr_results <- read.table("HbA1c_MR_Results.tsv", header = TRUE, sep = "\t"
 
 # In a new data frame, collect the metabolite names, Fixed_IVW_Estimate, and Fixed_IVW_Pval columns
 hba1c_mr_results_subset <- hba1c_mr_results[, c("Metabolite", "Fixed_IVW_Estimate", "Fixed_IVW_Pval", "Number_of_IVs", "Random_IVW_Pval")]
-# Get the correct metabolite names by fuzzy matching from responses_combined$name
-hba1c_mr_results_subset$Correct_Names <- sapply(hba1c_mr_results_subset$Metabolite, function(x) {
-  # Find the closest match in responses_combined$name
-  closest_match <- agrepl(x, responses_combined$name, ignore.case = TRUE)
-  # If there is a match, return the correct name, otherwise return NA
-  if (any(closest_match)) {
-    return(responses_combined$name[closest_match][1])
-  } else {
-    return(NA)
-  }
-})
 
 # Correcting the setup for top_significant calculation
 hba1c_mr_results_subset$logp <- -log10(ifelse(hba1c_mr_results_subset$Number_of_IVs <= 3, 
@@ -139,7 +107,7 @@ hba1c_mr_results_subset$color <- ifelse(hba1c_mr_results_subset$logp >= -log10(3
 volcano_plot <- ggplot(hba1c_mr_results_subset, aes(x = Fixed_IVW_Estimate, y = logp, color = color)) +
   geom_point(alpha = 0.8) +  
   scale_color_manual(values = c("red" = "red", "blue" = "blue", "grey" = "grey")) +
-  coord_cartesian(xlim = c(-0.15, 0.15), ylim = c(0, 13)) +
+  coord_cartesian(xlim = c(-0.15, 0.15), ylim = c(0, 15)) +
   theme_minimal() +
   labs(title = "Volcano Plot of MR Metabolite-HbA1c Associations",
        x = "Effect Size (Beta)",
@@ -148,7 +116,7 @@ volcano_plot <- ggplot(hba1c_mr_results_subset, aes(x = Fixed_IVW_Estimate, y = 
   geom_hline(yintercept = -log10(3.06e-5), linetype = "dashed", color = "black")
 # Adding labels only to the top significant metabolites, corrected placement and usage of aesthetics
 volcano_plot <- volcano_plot + 
-  geom_text(aes(label = ifelse(top_significant, as.character(hba1c_mr_results_subset$Correct_Names), ""), color = color),
+  geom_text(aes(label = ifelse(top_significant, as.character(hba1c_mr_results_subset$Metabolite), ""), color = color),
             vjust = 1.5, hjust = 0.5, size = 3.5, check_overlap = TRUE)
 # Print the plot
 print(volcano_plot)
@@ -316,6 +284,13 @@ t2dm_mr_results[t2dm_mr_results$Metabolite == "sphinganine", ]
 # Replicate previous MR analysis for sphinganine using the TwoSampleMR package
 mr_wald_ratio(t2dm_sphinganine_ivs$Beta, t2dm_sphinganine_ivs$t2dm_Beta, t2dm_sphinganine_ivs$SE, t2dm_sphinganine_ivs$t2dm_SE) # Replicated
 
+# Load the HbA1c IVs for the metabolite: xanthine
+hba1c_xanthine_ivs <- read.table("Harmonised_HbA1c_IVs/xanthineHBA1CHBA1C_harmonised_IVs.tsv", header = TRUE, sep = "\t")
+# Collect the previous MR results for xanthine from the HbA1c_MR_Results.tsv file
+hba1c_mr_results[hba1c_mr_results$Metabolite == "xanthine", ]
+# Replicate previous MR analysis for xanthine using the TwoSampleMR package
+mr_wald_ratio(hba1c_xanthine_ivs$Beta, hba1c_xanthine_ivs$hba1c_Beta, hba1c_xanthine_ivs$SE, hba1c_xanthine_ivs$hba1c_SE) # Replicated
+
 
 # Load in the significant T2DM metabolite results
 sig_T2DM_metabolites <- read.table("Filtered_T2DM_Results.tsv", header = TRUE, sep = "\t")
@@ -340,30 +315,13 @@ upper <- max(plotting_sig_T2DM_metabolites$Upper_CI)
 
 # Read in the responses_combined.tsv file
 responses_combined <- read.table("responses_combined.tsv", header = TRUE, sep = "\t")
-# Get the correct metabolite names by fuzzy matching from responses_combined$name
-plotting_sig_T2DM_metabolites$Correct_Names <- sapply(plotting_sig_T2DM_metabolites$Metabolite, function(x) {
-  # Find the closest match in responses_combined$name
-  closest_match <- agrepl(x, responses_combined$name, ignore.case = TRUE)
-  # If there is a match, return the correct name, otherwise return NA
-  if (any(closest_match)) {
-    return(responses_combined$name[closest_match][1])
-  } else {
-    return(NA)
-  }
-})
-# Display the metabolites that did not have a match
-plotting_sig_T2DM_metabolites[is.na(plotting_sig_T2DM_metabolites$Correct_Names), ]
-# Add the correct name: "sphingomyelin (d18:2/14:0, d18:1/14:1)*" for sphingomyelin (d18_2_14_0, d18_1_14_1)*
-plotting_sig_T2DM_metabolites$Correct_Names[plotting_sig_T2DM_metabolites$Metabolite == "sphingomyelin (d18_2_14_0, d18_1_14_1)*"] <- "sphingomyelin (d18:2/14:0, d18:1/14:1)*"
-# Add the correct name: "sphingomyelin (d18:2/24:1, d18:1/24:2)*" for sphingomyelin (d18_2_24_1, d18_1_24_2)*
-plotting_sig_T2DM_metabolites$Correct_Names[plotting_sig_T2DM_metabolites$Metabolite == "sphingomyelin (d18_2_24_1, d18_1_24_2)*"] <- "sphingomyelin (d18:2/24:1, d18:1/24:2)*"
 
 # Make a forest plot of the significant T2DM metabolites
 library(metafor)
 forest(
   plotting_sig_T2DM_metabolites$Beta, 
   sei=plotting_sig_T2DM_metabolites$SE, 
-  slab=plotting_sig_T2DM_metabolites$Correct_Names, 
+  slab=plotting_sig_T2DM_metabolites$Metabolite, 
        alim=c(-1, 1), # Adjust the axis limits to CI
        main="Standard Deviation Change in Metabolite Levels\nSignificantly Associated with Log Odds Ratio for T2DM",
        xlab="Log(OR)", 
@@ -395,31 +353,11 @@ plotting_sig_FG_metabolites$method <- "IVW"
 lower <- min(plotting_sig_FG_metabolites$Lower_CI)
 upper <- max(plotting_sig_FG_metabolites$Upper_CI)
 
-# Get the correct metabolite names by fuzzy matching from responses_combined$name
-plotting_sig_FG_metabolites$Correct_Names <- sapply(plotting_sig_FG_metabolites$Metabolite, function(x) {
-  # Find the closest match in responses_combined$name
-  closest_match <- agrepl(x, responses_combined$name, ignore.case = TRUE)
-  # If there is a match, return the correct name, otherwise return NA
-  if (any(closest_match)) {
-    return(responses_combined$name[closest_match][1])
-  } else {
-    return(NA)
-  }
-})
-# Display the metabolites that did not have a match
-plotting_sig_FG_metabolites[is.na(plotting_sig_FG_metabolites$Correct_Names), ]
-# Add the correct name: "sphingomyelin (d18:2/14:0, d18:1/14:1)*" for sphingomyelin (d18_2_14_0, d18_1_14_1)*
-plotting_sig_FG_metabolites$Correct_Names[plotting_sig_FG_metabolites$Metabolite == "sphingomyelin (d18_2_14_0, d18_1_14_1)*"] <- "sphingomyelin (d18:2/14:0, d18:1/14:1)*"
-# Add the correct name: "sphingomyelin (d18:2/24:1, d18:1/24:2)*" for sphingomyelin (d18_2_14_0, d18_1_14_1)*
-plotting_sig_FG_metabolites$Correct_Names[plotting_sig_FG_metabolites$Metabolite == "sphingomyelin (d18_2_24_1, d18_1_24_2)*"] <- "sphingomyelin (d18:2/24:1, d18:1/24:2)*"
-# Add the correct name: "sphingomyelin (d18:1/22:1, d18:2/22:0, d16:1/24:1)*" for sphingomyelin (d18_2_14_0, d18_1_14_1)*
-plotting_sig_FG_metabolites$Correct_Names[plotting_sig_FG_metabolites$Metabolite == "sphingomyelin (d18_1_22_1, d18_2_22_0, d16_1_24_1)*"] <- "sphingomyelin (d18:1/22:1, d18:2/22:0, d16:1/24:1)*"
-
 # Make a forest plot of the significant FG metabolites
 forest(
   plotting_sig_FG_metabolites$Beta, 
   sei=plotting_sig_FG_metabolites$SE, 
-  slab=plotting_sig_FG_metabolites$Correct_Names, 
+  slab=plotting_sig_FG_metabolites$Metabolite, 
        alim=c(-1, 1), # Adjust the axis limits to CI
        main="Standard Deviation Change in Metabolite Levels\nSignificantly Associated with a Change in FG",
        xlab="Standard Deviation Change in FG", 
@@ -449,35 +387,11 @@ plotting_sig_HBA1C_metabolites$method <- "IVW"
 lower <- min(plotting_sig_HBA1C_metabolites$Lower_CI)
 upper <- max(plotting_sig_HBA1C_metabolites$Upper_CI)
 
-# Get the correct metabolite names by fuzzy matching from responses_combined$name
-plotting_sig_HBA1C_metabolites$Correct_Names <- sapply(plotting_sig_HBA1C_metabolites$Metabolite, function(x) {
-  # Find the closest match in responses_combined$name
-  closest_match <- agrepl(x, responses_combined$name, ignore.case = TRUE)
-  # If there is a match, return the correct name, otherwise return NA
-  if (any(closest_match)) {
-    return(responses_combined$name[closest_match][1])
-  } else {
-    return(NA)
-  }
-})
-# Display the metabolites that did not have a match
-plotting_sig_HBA1C_metabolites[is.na(plotting_sig_HBA1C_metabolites$Correct_Names), ]
-# Add the correct name: "sphingomyelin (d18:2/14:0, d18:1/14:1)*" for sphingomyelin (d18_2_14_0, d18_1_14_1)*
-plotting_sig_HBA1C_metabolites$Correct_Names[plotting_sig_HBA1C_metabolites$Metabolite == "sphingomyelin (d18_2_14_0, d18_1_14_1)*"] <- "sphingomyelin (d18:2/14:0, d18:1/14:1)*"
-# Add the correct name: "sphingomyelin (d18:2/24:1, d18:1/24:2)*" for sphingomyelin (d18_2_24_1, d18_1_24_2)*
-plotting_sig_HBA1C_metabolites$Correct_Names[plotting_sig_HBA1C_metabolites$Metabolite == "sphingomyelin (d18_2_24_1, d18_1_24_2)*"] <- "sphingomyelin (d18:2/24:1, d18:1/24:2)*"
-# Add the correct name: "sphingomyelin (d18:1/22:1, d18:2/22:0, d16:1/24:1)*" for sphingomyelin (d18_1_22_1, d18_2_22_0, d16_1_24_1)*
-plotting_sig_HBA1C_metabolites$Correct_Names[plotting_sig_HBA1C_metabolites$Metabolite == "sphingomyelin (d18_1_22_1, d18_2_22_0, d16_1_24_1)*"] <- "sphingomyelin (d18:1/22:1, d18:2/22:0, d16:1/24:1)*"
-# Add the correct name: "sphingomyelin (d18:1/18:1, d18:2/18:0)" for sphingomyelin (d18_1_18_1, d18_2_18_0)
-plotting_sig_HBA1C_metabolites$Correct_Names[plotting_sig_HBA1C_metabolites$Metabolite == "sphingomyelin (d18_1_18_1, d18_2_18_0)"] <- "sphingomyelin (d18:1/18:1, d18:2/18:0)"
-# Add the correct name: "sphingomyelin (d18:1/15:0, d16:1/17:0)*" for sphingomyelin (d18_1_15_0, d16_1_17_0)*
-plotting_sig_HBA1C_metabolites$Correct_Names[plotting_sig_HBA1C_metabolites$Metabolite == "sphingomyelin (d18_1_15_0, d16_1_17_0)*"] <- "sphingomyelin (d18:1/15:0, d16:1/17:0)*"
-
 # Plot the significant HBA1C metabolites
 forest(
   plotting_sig_HBA1C_metabolites$Beta, 
   sei=plotting_sig_HBA1C_metabolites$SE, 
-  slab=plotting_sig_HBA1C_metabolites$Correct_Names, 
+  slab=plotting_sig_HBA1C_metabolites$Metabolite, 
   alim=c(-1, 1), # Adjust the axis limits to CI
   main="Standard Deviation Change in Metabolite Levels\nSignificantly Associated with a Change in HbA1c",
   xlab="Standard Deviation Change HbA1c", 
@@ -487,3 +401,4 @@ forest(
   psize=0.8, # Point size for the plot
   refline=0, # Reference line at effect size 0
   col="blue") # Color for points and lines
+

@@ -22,7 +22,7 @@ metabolites_to_remove <- metabolites_to_remove %>%
 
 significant_t2dm_results[significant_t2dm_results$Metabolite %in% metabolites_to_remove$Metabolite,] <- NA
 
-# One metabolite removed 57 to 57
+# No metabolites removed 59 to 59
 
 
 # Load the Metabolite_FG_Sensitivity_Analysis.tsv file
@@ -49,7 +49,7 @@ metabolites_to_remove <- metabolites_to_remove %>%
 
 significant_fg_results[significant_fg_results$Metabolite %in% metabolites_to_remove$Metabolite,] <- NA
 
-# Two metabolites removed 29 to 29
+# No metabolites removed 29 to 29
 
 
 # Load the Metabolite_HBA1C_Sensitivity_Analysis.tsv file
@@ -76,7 +76,7 @@ metabolites_to_remove <- metabolites_to_remove %>%
 
 significant_hba1c_results[significant_hba1c_results$Metabolite %in% metabolites_to_remove$Metabolite,] <- NA
 
-# One metabolite removed 30 to 30
+# No metabolites removed 29 to 29
 
 # Remove the rows with NA values in the Metabolite column for each of the significant results data frames
 significant_t2dm_results <- significant_t2dm_results %>% 
@@ -97,7 +97,7 @@ significant_t2dm_results[significant_t2dm_results$Metabolite %in% metabolites_to
 # Remove the rows with NA values in the Metabolite column for the significant T2DM results data frame
 significant_t2dm_results <- significant_t2dm_results %>% 
   dplyr::filter(!is.na(Metabolite))
-# Removed four metabolites 57 to 53
+# Removed four metabolites 59 to 55
 
 # Select the metabolites from the significant FG results that have an Egger_Pval < 0.05
 metabolites_to_remove <- significant_fg_results %>% 
@@ -121,7 +121,7 @@ significant_hba1c_results[significant_hba1c_results$Metabolite %in% metabolites_
 # Remove the rows with NA values in the Metabolite column for the significant HbA1C results data frame
 significant_hba1c_results <- significant_hba1c_results %>% 
   dplyr::filter(!is.na(Metabolite))
-# Removed two metabolites 30 to 28
+# Removed two metabolites 29 to 27
 
 
 # Save the significant results data frames to a file
@@ -175,7 +175,10 @@ Sig_Metabolites <- Sig_Metabolites %>% dplyr::select(-Index, -Metabolite)
 # Save the Sig_Metabolites dataframe to a file
 readr::write_tsv(Sig_Metabolites, "Sig_Metabolites_Compid.tsv")
 
-
+# Read in the Sig_Metabolites_Compid.tsv file
+Sig_Metabolites <- readr::read_tsv("Sig_Metabolites_Compid.tsv")
+# Remove any "M" from the compid column
+Sig_Metabolites$compid <- gsub("M", "", Sig_Metabolites$compid)
 
 
 

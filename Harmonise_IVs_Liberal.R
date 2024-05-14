@@ -1,58 +1,15 @@
-### Harmonise IVs ###
+### Harmonise IVs Liberally ###
 # This script is used to finalise the clumped, matched IVs for each metabolite by filtering by harmonising alleles.
 
 library(tidyverse)
-
-# Test this on the first metabolite
-# Load the data
-metabolite_1 <- readr::read_tsv("Matched_IVs/1-(1-enyl-oleoyl)-GPC (P-18_1)*T2DM_Matched_IVs.tsv")
-
-# Make new dataframes with the column names for harmonising alleles using TwoSampleMR
-exposure_data <- metabolite_1 %>% select(SNP, Beta, SE, EffectAllele, NonEffectAllele, EAF)
-outcome_data <- metabolite_1 %>% select(SNP, t2dm_Beta, t2dm_SE, t2dm_EffectAllele, t2dm_NonEffectAllele, t2dm_EAF)
-# Rename the columns
-colnames(exposure_data) <- c("SNP", "beta.exposure", "se.exposure", "effect_allele.exposure", "other_allele.exposure", "eaf.exposure")
-colnames(outcome_data) <- c("SNP", "beta.outcome", "se.outcome", "effect_allele.outcome", "other_allele.outcome", "eaf.outcome")
-# Add other required columns
-exposure_data$exposure <- "1-(1-enyl-oleoyl)-GPC (P-18:1)"
-exposure_data$id.exposure <- "1-(1-enyl-oleoyl)-GPC (P-18:1)"
-outcome_data$outcome <- "T2DM"
-outcome_data$id.outcome <- "T2DM"
-
 library(TwoSampleMR)
-
-# Harmonise alleles
-harmonised_IVs <- harmonise_data(exposure_data, outcome_data, action = 2)
-# For each IV in the harmonised data, print the remove, palindromic, ambigous and mr_keep values
-for (i in 1:nrow(harmonised_IVs)) {
-  print(paste("Remove:", harmonised_IVs$remove[i]))
-  print(paste("Palindromic:", harmonised_IVs$palindromic[i]))
-  print(paste("Ambiguous:", harmonised_IVs$ambiguous[i]))
-  print(paste("MR-keep:", harmonised_IVs$mr_keep[i]))
-}
-# Replace the original data with the harmonised data by matching on SNP
-for (i in 1:nrow(harmonised_IVs)) {
-  rsid <- harmonised_IVs$SNP[i]
-  rsid_data <- harmonised_IVs[i, ]
-  metabolite_1 <- metabolite_1 %>% mutate(Beta = ifelse(SNP == rsid, rsid_data$beta.exposure, Beta),
-                                          SE = ifelse(SNP == rsid, rsid_data$se.exposure, SE),
-                                          EffectAllele = ifelse(SNP == rsid, rsid_data$effect_allele.exposure, EffectAllele),
-                                          NonEffectAllele = ifelse(SNP == rsid, rsid_data$other_allele.exposure, NonEffectAllele),
-                                          EAF = ifelse(SNP == rsid, rsid_data$eaf.exposure, EAF),
-                                          t2dm_Beta = ifelse(SNP == rsid, rsid_data$beta.outcome, t2dm_Beta),
-                                          t2dm_SE = ifelse(SNP == rsid, rsid_data$se.outcome, t2dm_SE),
-                                          t2dm_EffectAllele = ifelse(SNP == rsid, rsid_data$effect_allele.outcome, t2dm_EffectAllele),
-                                          t2dm_NonEffectAllele = ifelse(SNP == rsid, rsid_data$other_allele.outcome, t2dm_NonEffectAllele),
-                                          t2dm_EAF = ifelse(SNP == rsid, rsid_data$eaf.outcome, t2dm_EAF))
-}
-
 
 ### Do this for all metabolites ###
 # Load the data
-metabolite_files <- list.files("Matched_IVs", full.names = TRUE)
+metabolite_files <- list.files("Liberal_Analysis/Matched_IVs_Liberal", full.names = TRUE)
 # Remove files the contain "FG_Matched_IVs" and "HBA1C_Matched_IVs"
-metabolite_files <- metabolite_files[!grepl("FG_Matched_IVs", metabolite_files)]
-metabolite_files <- metabolite_files[!grepl("HBA1C_Matched_IVs", metabolite_files)]
+metabolite_files <- metabolite_files[!grepl("FG_Matched_IVs_Liberal", metabolite_files)]
+metabolite_files <- metabolite_files[!grepl("HBA1C_Matched_IVs_Liberal", metabolite_files)]
 
 # Initialise a metabolite counter
 metabolite_counter <- 0
@@ -208,22 +165,22 @@ for (metabolite_file in metabolite_files) {
     multiple_IVs <- multiple_IVs + 1
     # Save the metabolite data
     # Extract the part of the file name before the "_Matched_IVs"
-    metabolite_name <- strsplit(basename(metabolite_file), "_Matched_IVs")[[1]][1]
+    metabolite_name <- strsplit(basename(metabolite_file), "_Matched_IVs_Liberal")[[1]][1]
     # Add "T2DM_Harmonised_IVs" to the file name
-    metabolite_name <- paste0(metabolite_name, "T2DM_Harmonised_IVs")
+    metabolite_name <- paste0(metabolite_name, "T2DM_Harmonised_IVs_Liberal")
     # Save the data
-    write.table(metabolite_data, paste0("Harmonised_T2DM_IVs/", metabolite_name, ".tsv"), sep = "\t", row.names = FALSE)
+    write.table(metabolite_data, paste0("Liberal_Analysis/Harmonised_T2DM_IVs_Liberal/", metabolite_name, ".tsv"), sep = "\t", row.names = FALSE)
     metabolite_counter <- metabolite_counter + 1
   }
   if (nrow(metabolite_data) == 1) {
     one_IV <- one_IV + 1
     # Save the metabolite data
     # Extract the part of the file name before the "_Matched_IVs"
-    metabolite_name <- strsplit(basename(metabolite_file), "_Matched_IVs")[[1]][1]
+    metabolite_name <- strsplit(basename(metabolite_file), "_Matched_IVs_Liberal")[[1]][1]
     # Add "T2DM_Harmonised_IVs" to the file name
-    metabolite_name <- paste0(metabolite_name, "T2DM_Harmonised_IVs")
+    metabolite_name <- paste0(metabolite_name, "T2DM_Harmonised_IVs_Liberal")
     # Save the data
-    write.table(metabolite_data, paste0("Harmonised_T2DM_IVs/", metabolite_name, ".tsv"), sep = "\t", row.names = FALSE)
+    write.table(metabolite_data, paste0("Liberal_Analysis/Harmonised_T2DM_IVs_Liberal/", metabolite_name, ".tsv"), sep = "\t", row.names = FALSE)
     metabolite_counter <- metabolite_counter + 1
   }
   if (nrow(metabolite_data) == 0) {
@@ -250,15 +207,12 @@ for (metabolite_file in metabolite_files) {
 
 
 
-
-
-
 ### Now for fasting glucose ###
 # Load the data
-metabolite_files <- list.files("Matched_IVs", full.names = TRUE)
+metabolite_files <- list.files("Liberal_Analysis/Matched_IVs_Liberal", full.names = TRUE)
 # Remove files the contain "FG_Matched_IVs" and "HBA1C_Matched_IVs"
-metabolite_files <- metabolite_files[!grepl("T2DM_Matched_IVs", metabolite_files)]
-metabolite_files <- metabolite_files[!grepl("HBA1C_Matched_IVs", metabolite_files)]
+metabolite_files <- metabolite_files[!grepl("T2DM_Matched_IVs_Liberal", metabolite_files)]
+metabolite_files <- metabolite_files[!grepl("HBA1C_Matched_IVs_Liberal", metabolite_files)]
 
 # Initialise a metabolite counter
 metabolite_counter <- 0
@@ -414,22 +368,22 @@ for (metabolite_file in metabolite_files) {
     multiple_IVs <- multiple_IVs + 1
     # Save the metabolite data
     # Extract the part of the file name before the "_Matched_IVs"
-    metabolite_name <- strsplit(basename(metabolite_file), "_Matched_IVs")[[1]][1]
+    metabolite_name <- strsplit(basename(metabolite_file), "_Matched_IVs_Liberal")[[1]][1]
     # Add "FG_Harmonised_IVs" to the file name
-    metabolite_name <- paste0(metabolite_name, "FG_Harmonised_IVs")
+    metabolite_name <- paste0(metabolite_name, "FG_Harmonised_IVs_Liberal")
     # Save the data
-    write.table(metabolite_data, paste0("Harmonised_FG_IVs/", metabolite_name, ".tsv"), sep = "\t", row.names = FALSE)
+    write.table(metabolite_data, paste0("Liberal_Analysis/Harmonised_FG_IVs_Liberal/", metabolite_name, ".tsv"), sep = "\t", row.names = FALSE)
     metabolite_counter <- metabolite_counter + 1
   }
   if (nrow(metabolite_data) == 1) {
     one_IV <- one_IV + 1
     # Save the metabolite data
     # Extract the part of the file name before the "_Matched_IVs"
-    metabolite_name <- strsplit(basename(metabolite_file), "_Matched_IVs")[[1]][1]
+    metabolite_name <- strsplit(basename(metabolite_file), "_Matched_IVs_Liberal")[[1]][1]
     # Add "FG_Harmonised_IVs" to the file name
-    metabolite_name <- paste0(metabolite_name, "FG_Harmonised_IVs")
+    metabolite_name <- paste0(metabolite_name, "FG_Harmonised_IVs_Liberal")
     # Save the data
-    write.table(metabolite_data, paste0("Harmonised_FG_IVs/", metabolite_name, ".tsv"), sep = "\t", row.names = FALSE)
+    write.table(metabolite_data, paste0("Liberal_Analysis/Harmonised_FG_IVs_Liberal/", metabolite_name, ".tsv"), sep = "\t", row.names = FALSE)
     metabolite_counter <- metabolite_counter + 1
   }
   if (nrow(metabolite_data) == 0) {
@@ -456,15 +410,12 @@ for (metabolite_file in metabolite_files) {
 
 
 
-
-
-
 ### Now for hbA1c ###
 # Load the data
-metabolite_files <- list.files("Matched_IVs", full.names = TRUE)
+metabolite_files <- list.files("Liberal_Analysis/Matched_IVs_Liberal", full.names = TRUE)
 # Remove files the contain "FG_Matched_IVs" and "HBA1C_Matched_IVs"
-metabolite_files <- metabolite_files[!grepl("FG_Matched_IVs", metabolite_files)]
-metabolite_files <- metabolite_files[!grepl("T2DM_Matched_IVs", metabolite_files)]
+metabolite_files <- metabolite_files[!grepl("FG_Matched_IVs_Liberal", metabolite_files)]
+metabolite_files <- metabolite_files[!grepl("T2DM_Matched_IVs_Liberal", metabolite_files)]
 
 # Initialise a metabolite counter
 metabolite_counter <- 0
@@ -620,22 +571,22 @@ for (metabolite_file in metabolite_files) {
     multiple_IVs <- multiple_IVs + 1
     # Save the metabolite data
     # Extract the part of the file name before the "_Matched_IVs"
-    metabolite_name <- strsplit(basename(metabolite_file), "_Matched_IVs")[[1]][1]
+    metabolite_name <- strsplit(basename(metabolite_file), "_Matched_IVs_Liberal")[[1]][1]
     # Add "HBA1C_Harmonised_IVs" to the file name
-    metabolite_name <- paste0(metabolite_name, "HBA1C_Harmonised_IVs")
+    metabolite_name <- paste0(metabolite_name, "HBA1C_Harmonised_IVs_Liberal")
     # Save the data
-    write.table(metabolite_data, paste0("Harmonised_HBA1C_IVs/", metabolite_name, ".tsv"), sep = "\t", row.names = FALSE)
+    write.table(metabolite_data, paste0("Liberal_Analysis/Harmonised_HBA1C_IVs_Liberal/", metabolite_name, ".tsv"), sep = "\t", row.names = FALSE)
     metabolite_counter <- metabolite_counter + 1
   }
   if (nrow(metabolite_data) == 1) {
     one_IV <- one_IV + 1
     # Save the metabolite data
     # Extract the part of the file name before the "_Matched_IVs"
-    metabolite_name <- strsplit(basename(metabolite_file), "_Matched_IVs")[[1]][1]
+    metabolite_name <- strsplit(basename(metabolite_file), "_Matched_IVs_Liberal")[[1]][1]
     # Add "HBA1C_Harmonised_IVs" to the file name
-    metabolite_name <- paste0(metabolite_name, "HBA1C_Harmonised_IVs")
+    metabolite_name <- paste0(metabolite_name, "HBA1C_Harmonised_IVs_Liberal")
     # Save the data
-    write.table(metabolite_data, paste0("Harmonised_HBA1C_IVs/", metabolite_name, ".tsv"), sep = "\t", row.names = FALSE)
+    write.table(metabolite_data, paste0("Liberal_Analysis/Harmonised_HBA1C_IVs_Liberal/", metabolite_name, ".tsv"), sep = "\t", row.names = FALSE)
     metabolite_counter <- metabolite_counter + 1
   }
   if (nrow(metabolite_data) == 0) {
@@ -658,27 +609,6 @@ for (metabolite_file in metabolite_files) {
   print(paste0("Number of Metabolites with one IV: ", one_IV))
   print(paste0("Number of Metabolites removed: ", no_IVs))
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

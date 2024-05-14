@@ -1,10 +1,10 @@
 # Load in the T2DM_MR_Results file
 T2DM_results <- readr::read_tsv("T2DM_MR_Results.tsv")
 
-# Make a new table with only the rows that have a Fixed_IVW_Pval < 3.06e-5 if the metabolite had 3 or less IVs
-significant_T2DM_results <- T2DM_results[which(T2DM_results$Fixed_IVW_Pval < 3.06e-5 & T2DM_results$Number_of_IVs <= 3),]
-# Add in the metabolites that have more than 3 IVs and have a Random_IVW_Pval < 3.06e-5
-significant_T2DM_results <- rbind(significant_T2DM_results, T2DM_results[which(T2DM_results$Random_IVW_Pval < 3.06e-5 & T2DM_results$Number_of_IVs > 3),])
+# Make a new table with only the rows that have a Fixed_IVW_Pval < 3.006614e-5 if the metabolite had 3 or less IVs
+significant_T2DM_results <- T2DM_results[which(T2DM_results$Fixed_IVW_Pval < 3.006614e-5 & T2DM_results$Number_of_IVs <= 3),]
+# Add in the metabolites that have more than 3 IVs and have a Random_IVW_Pval < 3.006614e-5
+significant_T2DM_results <- rbind(significant_T2DM_results, T2DM_results[which(T2DM_results$Random_IVW_Pval < 3.006614e-5 & T2DM_results$Number_of_IVs > 3),])
 
 # Keep rows with Fixed_IVW_FStat > 10
 significant_T2DM_results <- significant_T2DM_results[which(significant_T2DM_results$Fixed_IVW_FStat > 10),]
@@ -28,17 +28,17 @@ significant_T2DM_results <- significant_T2DM_results[which(is.na(significant_T2D
 significant_T2DM_results <- rbind(significant_T2DM_results, holder)
 # Save the significant_T2DM_results table to a new file
 write.table(significant_T2DM_results, "significant_T2DM_results.tsv", sep = "\t", row.names = FALSE)
-# 524 to 62 to 58 to 57
+# 545 to 64 to 60 to 59
 
 
 ### Now for fasting glucose ###
 # Load in the FG_MR_Results file
 FG_results <- readr::read_tsv("FG_MR_Results.tsv")
 
-# Make a new table with only the rows that have a Fixed_IVW_Pval < 3.06e-5 if the metabolite had 3 or less IVs
-significant_FG_results <- FG_results[which(FG_results$Fixed_IVW_Pval < 3.06e-5 & FG_results$Number_of_IVs <= 3),]
-# Add in the metabolites that have more than 3 IVs and have a Random_IVW_Pval < 3.06e-5
-significant_FG_results <- rbind(significant_FG_results, FG_results[which(FG_results$Random_IVW_Pval < 3.06e-5 & FG_results$Number_of_IVs > 3),])
+# Make a new table with only the rows that have a Fixed_IVW_Pval < 3.006614e-5 if the metabolite had 3 or less IVs
+significant_FG_results <- FG_results[which(FG_results$Fixed_IVW_Pval < 3.006614e-5 & FG_results$Number_of_IVs <= 3),]
+# Add in the metabolites that have more than 3 IVs and have a Random_IVW_Pval < 3.006614e-5
+significant_FG_results <- rbind(significant_FG_results, FG_results[which(FG_results$Random_IVW_Pval < 3.006614e-5 & FG_results$Number_of_IVs > 3),])
 
 # Keep rows with Fixed_IVW_FStat > 10
 significant_FG_results <- significant_FG_results[which(significant_FG_results$Fixed_IVW_FStat > 10),]
@@ -62,7 +62,8 @@ significant_FG_results <- significant_FG_results[which(is.na(significant_FG_resu
 significant_FG_results <- rbind(significant_FG_results, holder)
 # Save the significant_FG_results table to a new file
 write.table(significant_FG_results, "significant_FG_results.tsv", sep = "\t", row.names = FALSE)
-# 553 to 33 to 30 to 29
+# 559 to 33 to 30 to 29
+
 
 
 
@@ -70,10 +71,10 @@ write.table(significant_FG_results, "significant_FG_results.tsv", sep = "\t", ro
 # Load in the HBA1C_MR_Results file
 HBA1C_results <- readr::read_tsv("HBA1C_MR_Results.tsv")
 
-# Make a new table with only the rows that have a Fixed_IVW_Pval < 3.06e-5 if the metabolite had 3 or less IVs
-significant_HBA1C_results <- HBA1C_results[which(HBA1C_results$Fixed_IVW_Pval < 3.06e-5 & HBA1C_results$Number_of_IVs <= 3),]
-# Add in the metabolites that have more than 3 IVs and have a Random_IVW_Pval < 3.06e-5
-significant_HBA1C_results <- rbind(significant_HBA1C_results, HBA1C_results[which(HBA1C_results$Random_IVW_Pval < 3.06e-5 & HBA1C_results$Number_of_IVs > 3),])
+# Make a new table with only the rows that have a Fixed_IVW_Pval < 3.006614e-5 if the metabolite had 3 or less IVs
+significant_HBA1C_results <- HBA1C_results[which(HBA1C_results$Fixed_IVW_Pval < 3.006614e-5 & HBA1C_results$Number_of_IVs <= 3),]
+# Add in the metabolites that have more than 3 IVs and have a Random_IVW_Pval < 3.006614e-5
+significant_HBA1C_results <- rbind(significant_HBA1C_results, HBA1C_results[which(HBA1C_results$Random_IVW_Pval < 3.006614e-5 & HBA1C_results$Number_of_IVs > 3),])
 
 # Keep rows with Fixed_IVW_FStat > 10
 significant_HBA1C_results <- significant_HBA1C_results[which(significant_HBA1C_results$Fixed_IVW_FStat > 10),]
@@ -97,7 +98,7 @@ significant_HBA1C_results <- significant_HBA1C_results[which(is.na(significant_H
 significant_HBA1C_results <- rbind(significant_HBA1C_results, holder)
 # Save the significant_HBA1C_results table to a new file
 write.table(significant_HBA1C_results, "significant_HBA1C_results.tsv", sep = "\t", row.names = FALSE)
-# 553 to 32 to 30 to 30
+# 559 to 31 to 29 to 29
 
 
 ### Merge the significant results into one table ###
@@ -124,3 +125,6 @@ colnames(full_significant_results_df)[60:ncol(full_significant_results_df)] <- p
 # Save the results as a tsv file
 write.table(full_significant_results_df, file = "Full_Significant_Results.tsv", sep = "\t", row.names = FALSE)
 
+
+# Check which metabolites have values in all three datasets
+overlapping_metabolites <- full_significant_results_df[which(!is.na(full_significant_results_df$Fixed_IVW_Pval_T2DM) & !is.na(full_significant_results_df$Fixed_IVW_Pval_FG) & !is.na(full_significant_results_df$Fixed_IVW_Pval_HBA1C)),]

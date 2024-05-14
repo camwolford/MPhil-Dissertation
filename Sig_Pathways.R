@@ -175,11 +175,12 @@ superpathway_T2DM_counts <- superpathway_T2DM_counts %>%
 # Plot the number of T2DM SNP associations that have more than one associated metabolite for each superpathway 
 ggplot(superpathway_T2DM_counts, aes(reorder(superpathway, n), n)) +
   geom_bar(stat = "identity") +
-  labs(title = "Number of T2DM SNP associations with more than one associated metabolite for each superpathway",
+  labs(title = "Number of T2DM SNP associations with more than one associated metabolite \n for each superpathway",
        x = "Superpathway",
        y = "Number of SNPs") +
   theme_minimal() +
-  theme(axis.text.x = element_text(angle = 0, hjust = 0.5))
+  theme(axis.text.x = element_text(angle = 0, hjust = 0.5),  # Adjust horizontal justification for x-axis labels
+        plot.title = element_text(hjust = 0.5))  # Center the title
 
 # Calculate the number of T2DM SNP associations that have more than one associated metabolite for each subpathway
 subpathway_T2DM_counts <- T2DM_snp_counts %>%
@@ -199,9 +200,10 @@ subpathway_T2DM_counts <- subpathway_T2DM_counts %>%
 # Plot the number of T2DM SNP associations that have more than one associated metabolite for each subpathway
 ggplot(subpathway_T2DM_counts, aes(reorder(subpathway, n), n)) +
   geom_bar(stat = "identity") +
-  labs(title = "Number of T2DM SNP associations with more than one associated metabolite for each subpathway",
+  labs(title = "Number of T2DM SNP associations with more than one associated metabolite \n for each subpathway",
        x = "Subpathway",
        y = "Number of SNPs") +
   theme_minimal() +
-  theme(axis.text.x = element_text(angle = 0, hjust = 0.5))
+  theme(axis.text.x = element_text(angle = 0, hjust = 0.5),  # Adjust horizontal justification for x-axis labels
+        plot.title = element_text(hjust = 0.5))  # Center the title
   

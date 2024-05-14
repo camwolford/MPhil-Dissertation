@@ -1,45 +1,15 @@
-### Match IVs ###
+### Match IVs Liberally ###
 # This script is used to match the clumped IVs for each metabolite by filtering by F statistics, matching variants and finding proxies.
-
-# Test this on the first metabolite
-# Load the data
-metabolite_1 <- readr::read_tsv("Clumped_IVs/1-(1-enyl-oleoyl)-GPC (P-18_1)*_Clumped_IVs.tsv")
-
-# Calculate the F statistics
-metabolite_1$Fstat <- (metabolite_1$Beta / metabolite_1$SE)^2
-
-# Keep all IVs even if they have a low F statistic but check if any have a low F statistic
-if (any(metabolite_1$Fstat < 10)) {
-  # Remove IVs with a low F statistic
-  print("Metabolite has an IV with a low F statistic")
-} else {
-  print("Metabolite has no IVs with a low F statistic")
-}
 
 # Load in the outcome GWAS data
 t2dm_data <- readr::read_tsv("t2dm_gwas_cleaned.tsv")
-# how many rows have NAs
-sum(is.na(t2dm_data))
-
 # For each of the outcome GWAS data, make a new column called "MarkerName"
 t2dm_data$MarkerName <- paste("chr", t2dm_data$Chromosome, "_", t2dm_data$Position, "_", t2dm_data$EffectAllele, "_", t2dm_data$NonEffectAllele, sep = "")
-
-# Make a reverse marker name column
-metabolite_1$reverseMarkerName <- paste("chr", metabolite_1$Chromosome, "_", metabolite_1$Position, "_", metabolite_1$NonEffectAllele, "_", metabolite_1$EffectAllele, sep = "")
-
-# Check the first value of the MarkerName colum
-t2dm_data$MarkerName[1]
-
-# Check if any of the metabolite_1$MarkerName are in the t2dm_data$MarkerName
-sum(metabolite_1$MarkerName %in% t2dm_data$MarkerName)
-sum(metabolite_1$reverseMarkerName %in% t2dm_data$MarkerName)
-
-
 
 
 ### Perform the IV matching on all metabolites ###
 # Load in each metabolite data in /Clumped_IVs
-metabolite_files <- list.files("Clumped_IVs", full.names = TRUE)
+metabolite_files <- list.files("Liberal_Analysis/Clumped_IVs_Liberal", full.names = TRUE)
 
 if (!require("BiocManager", quietly = TRUE))
   install.packages("BiocManager")
@@ -152,11 +122,11 @@ for (metabolite_file in metabolite_files) {
         searchspace = NULL,
         tag_kb = 5000,
         tag_nsnp = 5000,
-        tag_r2 = 0.9,
+        tag_r2 = 0.8,
         threads = 1,
         out = tempfile())
-      # Remove proxies with ld_proxies$R < 0.9
-      ld_proxies <- ld_proxies[ld_proxies$R >= 0.9, ]
+      # Remove proxies with ld_proxies$R < 0.8
+      ld_proxies <- ld_proxies[ld_proxies$R >= 0.8, ]
       # Check if any of the proxies are in the outcome GWAS data using a for loop, break if a proxy is found
       for (j in 1:nrow(ld_proxies)) {
         if (any(t2dm_data$Chromosome == ld_proxies$CHR_B[j] & t2dm_data$Position == ld_proxies$BP_B[j] & t2dm_data$EffectAllele == ld_proxies$B1[j] & 
@@ -226,22 +196,22 @@ for (metabolite_file in metabolite_files) {
     multiple_IVs <- multiple_IVs + 1
     # Save the metabolite data with the IV information
     # Extract the part of the file name before the "_Clumped_IVs"
-    metabolite_name <- strsplit(basename(metabolite_file), "_Clumped_IVs")[[1]][1]
+    metabolite_name <- strsplit(basename(metabolite_file), "_Clumped_IVs_Liberal")[[1]][1]
     # Add "T2DM_Finalised_IVs" to the file name
-    metabolite_name <- paste0(metabolite_name, "T2DM_Matched_IVs")
+    metabolite_name <- paste0(metabolite_name, "T2DM_Matched_IVs_Liberal")
     # Save the data
-    write.table(metabolite_data, paste0("Matched_IVs/", metabolite_name, ".tsv"), sep = "\t", row.names = FALSE)
+    write.table(metabolite_data, paste0("Liberal_Analysis/Matched_IVs_Liberal/", metabolite_name, ".tsv"), sep = "\t", row.names = FALSE)
     metabolite_counter <- metabolite_counter + 1
   }
   if (nrow(metabolite_data) == 1) {
     one_IV <- one_IV + 1
     # Save the metabolite data with the IV information
     # Extract the part of the file name before the "_Clumped_IVs"
-    metabolite_name <- strsplit(basename(metabolite_file), "_Clumped_IVs")[[1]][1]
+    metabolite_name <- strsplit(basename(metabolite_file), "_Clumped_IVs_Liberal")[[1]][1]
     # Add "T2DM_Finalised_IVs" to the file name
-    metabolite_name <- paste0(metabolite_name, "T2DM_Matched_IVs")
+    metabolite_name <- paste0(metabolite_name, "T2DM_Matched_IVs_Liberal")
     # Save the data
-    write.table(metabolite_data, paste0("Matched_IVs/", metabolite_name, ".tsv"), sep = "\t", row.names = FALSE)
+    write.table(metabolite_data, paste0("Liberal_Analysis/Matched_IVs_Liberal/", metabolite_name, ".tsv"), sep = "\t", row.names = FALSE)
     metabolite_counter <- metabolite_counter + 1
   }
   if (nrow(metabolite_data) == 0) {
@@ -259,49 +229,20 @@ for (metabolite_file in metabolite_files) {
   print(paste("Removed IVs:", removed_IVs))
 }
 
-# Check it worked
-check <- readr::read_tsv("Matched_IVs/1-(1-enyl-oleoyl)-GPC (P-18_1)*T2DM_Matched_IVs.tsv")
-check2 <- readr::read_tsv("Matched_IVs/1-(1-enyl-palmitoyl)-2-oleoyl-GPE (P-16_0_18_1)*T2DM_Matched_IVs.tsv")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
 ### Do the same for fasting glucose ###
 
 fg_data <- readr::read_tsv("fasting_glucose_gwas_cleaned.tsv")
-
-# How many rows contain NAs
-sum(is.na(fg_data))
 # Remove rows with NAs
 fg_data <- fg_data[!is.na(fg_data$EAF), ]
 
 fg_data$MarkerName <- paste("chr", fg_data$Chromosome, "_", fg_data$Position, "_", fg_data$EffectAllele, "_", fg_data$NonEffectAllele, sep = "")
-fg_data$MarkerName[1]
-
-# Are there any repeats of the MarkerNames?
-sum(duplicated(fg_data$MarkerName))
 
 ### Perform the IV matching on all metabolites ###
 # Load in each metabolite data in /Clumped_IVs
-metabolite_files <- list.files("Clumped_IVs", full.names = TRUE)
+metabolite_files <- list.files("Liberal_Analysis/Clumped_IVs_Liberal", full.names = TRUE)
 
 gwasvcf::set_plink(genetics.binaRies::get_plink_binary())
 
@@ -409,11 +350,11 @@ for (metabolite_file in metabolite_files) {
         searchspace = NULL,
         tag_kb = 5000,
         tag_nsnp = 5000,
-        tag_r2 = 0.9,
+        tag_r2 = 0.8,
         threads = 1,
         out = tempfile())
-      # Remove proxies with ld_proxies$R < 0.9
-      ld_proxies <- ld_proxies[ld_proxies$R >= 0.9, ]
+      # Remove proxies with ld_proxies$R < 0.8
+      ld_proxies <- ld_proxies[ld_proxies$R >= 0.8, ]
       # Check if any of the proxies are in the outcome GWAS data using a for loop, break if a proxy is found
       for (j in 1:nrow(ld_proxies)) {
         if (any(fg_data$Chromosome == ld_proxies$CHR_B[j] & fg_data$Position == ld_proxies$BP_B[j] & fg_data$EffectAllele == ld_proxies$B1[j] & 
@@ -483,22 +424,22 @@ for (metabolite_file in metabolite_files) {
     multiple_IVs <- multiple_IVs + 1
     # Save the metabolite data with the IV information
     # Extract the part of the file name before the "_Clumped_IVs"
-    metabolite_name <- strsplit(basename(metabolite_file), "_Clumped_IVs")[[1]][1]
+    metabolite_name <- strsplit(basename(metabolite_file), "_Clumped_IVs_Liberal")[[1]][1]
     # Add "FG_Finalised_IVs" to the file name
-    metabolite_name <- paste0(metabolite_name, "FG_Matched_IVs")
+    metabolite_name <- paste0(metabolite_name, "FG_Matched_IVs_Liberal")
     # Save the data
-    write.table(metabolite_data, paste0("Matched_IVs/", metabolite_name, ".tsv"), sep = "\t", row.names = FALSE)
+    write.table(metabolite_data, paste0("Liberal_Analysis/Matched_IVs_Liberal/", metabolite_name, ".tsv"), sep = "\t", row.names = FALSE)
     metabolite_counter <- metabolite_counter + 1
   }
   if (nrow(metabolite_data) == 1) {
     one_IV <- one_IV + 1
     # Save the metabolite data with the IV information
     # Extract the part of the file name before the "_Clumped_IVs"
-    metabolite_name <- strsplit(basename(metabolite_file), "_Clumped_IVs")[[1]][1]
+    metabolite_name <- strsplit(basename(metabolite_file), "_Clumped_IVs_Liberal")[[1]][1]
     # Add "FG_Finalised_IVs" to the file name
-    metabolite_name <- paste0(metabolite_name, "FG_Matched_IVs")
+    metabolite_name <- paste0(metabolite_name, "FG_Matched_IVs_Liberal")
     # Save the data
-    write.table(metabolite_data, paste0("Matched_IVs/", metabolite_name, ".tsv"), sep = "\t", row.names = FALSE)
+    write.table(metabolite_data, paste0("Liberal_Analysis/Matched_IVs_Liberal/", metabolite_name, ".tsv"), sep = "\t", row.names = FALSE)
     metabolite_counter <- metabolite_counter + 1
   }
   if (nrow(metabolite_data) == 0) {
@@ -516,57 +457,16 @@ for (metabolite_file in metabolite_files) {
   print(paste("Removed IVs:", removed_IVs))
 }
 
-# Check it worked
-check <- readr::read_tsv("Matched_IVs/1-(1-enyl-oleoyl)-GPC (P-18_1)*FG_Matched_IVs.tsv")
-check2 <- readr::read_tsv("Matched_IVs/1-(1-enyl-palmitoyl)-2-oleoyl-GPE (P-16_0_18_1)*FG_Matched_IVs.tsv")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 ### Do the same for HbA1c ###
-
 hba1c_data <- readr::read_tsv("hba1c_gwas_cleaned.tsv")
-
-# How many rows contain NAs
-sum(is.na(hba1c_data))
 # Remove rows with NAs
 hba1c_data <- hba1c_data[!is.na(hba1c_data$EAF), ]
-
 hba1c_data$MarkerName <- paste("chr", hba1c_data$Chromosome, "_", hba1c_data$Position, "_", hba1c_data$EffectAllele, "_", hba1c_data$NonEffectAllele, sep = "")
-hba1c_data$MarkerName[1]
-
-# Are there any repeats of the MarkerNames?
-sum(duplicated(hba1c_data$MarkerName))
 
 ### Perform the IV matching on all metabolites ###
 # Load in each metabolite data in /Clumped_IVs
-metabolite_files <- list.files("Clumped_IVs", full.names = TRUE)
+metabolite_files <- list.files("Liberal_Analysis/Clumped_IVs_Liberal", full.names = TRUE)
 
 gwasvcf::set_plink(genetics.binaRies::get_plink_binary())
 
@@ -674,11 +574,11 @@ for (metabolite_file in metabolite_files) {
         searchspace = NULL,
         tag_kb = 5000,
         tag_nsnp = 5000,
-        tag_r2 = 0.9,
+        tag_r2 = 0.8,
         threads = 1,
         out = tempfile())
-      # Remove proxies with ld_proxies$R < 0.9
-      ld_proxies <- ld_proxies[ld_proxies$R >= 0.9, ]
+      # Remove proxies with ld_proxies$R < 0.8
+      ld_proxies <- ld_proxies[ld_proxies$R >= 0.8, ]
       # Check if any of the proxies are in the outcome GWAS data using a for loop, break if a proxy is found
       for (j in 1:nrow(ld_proxies)) {
         if (any(hba1c_data$Chromosome == ld_proxies$CHR_B[j] & hba1c_data$Position == ld_proxies$BP_B[j] & hba1c_data$EffectAllele == ld_proxies$B1[j] & 
@@ -748,22 +648,22 @@ for (metabolite_file in metabolite_files) {
     multiple_IVs <- multiple_IVs + 1
     # Save the metabolite data with the IV information
     # Extract the part of the file name before the "_Clumped_IVs"
-    metabolite_name <- strsplit(basename(metabolite_file), "_Clumped_IVs")[[1]][1]
+    metabolite_name <- strsplit(basename(metabolite_file), "_Clumped_IVs_Liberal")[[1]][1]
     # Add "HBA1C_Finalised_IVs" to the file name
-    metabolite_name <- paste0(metabolite_name, "HBA1C_Matched_IVs")
+    metabolite_name <- paste0(metabolite_name, "HBA1C_Matched_IVs_Liberal")
     # Save the data
-    write.table(metabolite_data, paste0("Matched_IVs/", metabolite_name, ".tsv"), sep = "\t", row.names = FALSE)
+    write.table(metabolite_data, paste0("Liberal_Analysis/Matched_IVs_Liberal/", metabolite_name, ".tsv"), sep = "\t", row.names = FALSE)
     metabolite_counter <- metabolite_counter + 1
   }
   if (nrow(metabolite_data) == 1) {
     one_IV <- one_IV + 1
     # Save the metabolite data with the IV information
     # Extract the part of the file name before the "_Clumped_IVs"
-    metabolite_name <- strsplit(basename(metabolite_file), "_Clumped_IVs")[[1]][1]
+    metabolite_name <- strsplit(basename(metabolite_file), "_Clumped_IVs_Liberal")[[1]][1]
     # Add "HBA1C_Finalised_IVs" to the file name
-    metabolite_name <- paste0(metabolite_name, "HBA1C_Matched_IVs")
+    metabolite_name <- paste0(metabolite_name, "HBA1C_Matched_IVs_Liberal")
     # Save the data
-    write.table(metabolite_data, paste0("Matched_IVs/", metabolite_name, ".tsv"), sep = "\t", row.names = FALSE)
+    write.table(metabolite_data, paste0("Liberal_Analysis/Matched_IVs_Liberal/", metabolite_name, ".tsv"), sep = "\t", row.names = FALSE)
     metabolite_counter <- metabolite_counter + 1
   }
   if (nrow(metabolite_data) == 0) {
@@ -781,9 +681,6 @@ for (metabolite_file in metabolite_files) {
   print(paste("Removed IVs:", removed_IVs))
 }
 
-# Check it worked
-check <- readr::read_tsv("Matched_IVs/1-(1-enyl-oleoyl)-GPC (P-18_1)*HBA1C_Matched_IVs.tsv")
-check2 <- readr::read_tsv("Matched_IVs/1-(1-enyl-palmitoyl)-2-oleoyl-GPE (P-16_0_18_1)*HBA1C_Matched_IVs.tsv")
 
 
 

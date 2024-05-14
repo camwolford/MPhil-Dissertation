@@ -1,37 +1,9 @@
 library(MendelianRandomization)
 library(dplyr)
 
-# Load the test data
-test_data <- readr::read_tsv("Harmonised_T2DM_IVs/1-eicosenoyl-GPC (20_1)*T2DMT2DM_Harmonised_IVs.tsv")
-
-# If the value for EffectAllele, NonEffectAllele, t2dm_EffectAllele or t2dm_NonEffectAllele is TRUE, change it to T as a character
-test_data$EffectAllele <- ifelse(test_data$EffectAllele == TRUE, "T", test_data$EffectAllele)
-test_data$NonEffectAllele <- ifelse(test_data$NonEffectAllele == TRUE, "T", test_data$NonEffectAllele)
-test_data$t2dm_EffectAllele <- ifelse(test_data$t2dm_EffectAllele == TRUE, "T", test_data$t2dm_EffectAllele)
-test_data$t2dm_NonEffectAllele <- ifelse(test_data$t2dm_NonEffectAllele == TRUE, "T", test_data$t2dm_NonEffectAllele)
-test_data$proxy_EffectAllele <- ifelse(test_data$proxy_EffectAllele == TRUE, "T", test_data$proxy_EffectAllele)
-test_data$proxy_NonEffectAllele <- ifelse(test_data$proxy_NonEffectAllele == TRUE, "T", test_data$proxy_NonEffectAllele)
-
-
-### MR Analysis using the MendelianRandomization package ###
-
-MRObject = mr_input(bx = test_data$Beta, bxse = test_data$SE, by = test_data$t2dm_Beta, byse = test_data$t2dm_SE)
-MR_weighted_mode_out <- MendelianRandomization::mr_mbe(MRObject, weighting = "weighted")
-MR_weighted_median_out <- MendelianRandomization::mr_median(MRObject, weighting = "weighted")
-MR_random_IVW_out <- MendelianRandomization::mr_ivw(MRObject, model = "random")
-MR_fixed_IVW_out <- MendelianRandomization::mr_ivw(MRObject, model = "fixed")
-MR_egger_out <- MendelianRandomization::mr_egger(MRObject)
-
-# Load the one IV test data
-one_iv_data <- readr::read_tsv("Harmonised_T2DM_IVs/1-(1-enyl-stearoyl)-2-docosahexaenoyl-GPC (P-18_0_22_6)*T2DMT2DM_Harmonised_IVs.tsv")
-MRObject = mr_input(bx = one_iv_data$Beta, bxse = one_iv_data$SE, by = one_iv_data$t2dm_Beta, byse = one_iv_data$t2dm_SE)
-MR_WR_out <- MendelianRandomization::mr_ivw(MRObject)
-
-
-
 ### Perform this for all metabolites ###
 # Load the data
-metabolite_files <- list.files("Harmonised_T2DM_IVs", full.names = TRUE)
+metabolite_files <- list.files("Liberal_Analysis/Harmonised_T2DM_IVs_Liberal", full.names = TRUE)
 
 # Initialise a counter for the number of rows equal to the number of metabolite_files
 number_of_metabolites <- length(metabolite_files)
@@ -159,7 +131,7 @@ for (metabolite_file in metabolite_files) {
 }
 
 # Save the results as a tsv file
-write.table(results_df, file = "T2DM_MR_Results.tsv", sep = "\t", row.names = FALSE)
+write.table(results_df, file = "Liberal_Analysis/T2DM_MR_Results_Liberal.tsv", sep = "\t", row.names = FALSE)
 
 
 
@@ -170,7 +142,7 @@ write.table(results_df, file = "T2DM_MR_Results.tsv", sep = "\t", row.names = FA
 ### Do the same for Fasting Glucose ###  
 ### Perform this for all metabolites ###
 # Load the data
-metabolite_files <- list.files("Harmonised_FG_IVs", full.names = TRUE)
+metabolite_files <- list.files("Liberal_Analysis/Harmonised_FG_IVs_Liberal", full.names = TRUE)
 
 # Initialise a counter for the number of rows equal to the number of metabolite_files
 number_of_metabolites <- length(metabolite_files)
@@ -298,7 +270,7 @@ for (metabolite_file in metabolite_files) {
 }
 
 # Save the results as a tsv file
-write.table(results_df, file = "FG_MR_Results.tsv", sep = "\t", row.names = FALSE)
+write.table(results_df, file = "Liberal_Analysis/FG_MR_Results_Liberal.tsv", sep = "\t", row.names = FALSE)
 
 
 
@@ -310,7 +282,7 @@ write.table(results_df, file = "FG_MR_Results.tsv", sep = "\t", row.names = FALS
 ### Do the same for HbA1c ###  
 ### Perform this for all metabolites ###
 # Load the data
-metabolite_files <- list.files("Harmonised_HBA1C_IVs", full.names = TRUE)
+metabolite_files <- list.files("Liberal_Analysis/Harmonised_HBA1C_IVs_Liberal", full.names = TRUE)
 
 # Initialise a counter for the number of rows equal to the number of metabolite_files
 number_of_metabolites <- length(metabolite_files)
@@ -438,15 +410,15 @@ for (metabolite_file in metabolite_files) {
 }
 
 # Save the results as a tsv file
-write.table(results_df, file = "HBA1C_MR_Results.tsv", sep = "\t", row.names = FALSE)
+write.table(results_df, file = "Liberal_Analysis/HBA1C_MR_Results_Liberal.tsv", sep = "\t", row.names = FALSE)
 
 
 
 # Merge all of the results into a single dataframe
 # Load the results
-T2DM_results <- readr::read_tsv("T2DM_MR_Results.tsv")
-FG_results <- readr::read_tsv("FG_MR_Results.tsv")
-HBA1C_results <- readr::read_tsv("HBA1C_MR_Results.tsv")
+T2DM_results <- readr::read_tsv("Liberal_Analysis/T2DM_MR_Results_Liberal.tsv")
+FG_results <- readr::read_tsv("Liberal_Analysis/FG_MR_Results_Liberal.tsv")
+HBA1C_results <- readr::read_tsv("Liberal_Analysis/HBA1C_MR_Results_Liberal.tsv")
 
 # Make a new dataframe to store the merged results
 # First find the number of unique metabolites between the three datasets
@@ -469,4 +441,4 @@ colnames(full_results_df) <- gsub("\\.y", "_FG", colnames(full_results_df))
 colnames(full_results_df)[60:ncol(full_results_df)] <- paste(colnames(full_results_df)[60:ncol(full_results_df)], "_HBA1C", sep = "")
 
 # Save the results as a tsv file
-write.table(full_results_df, file = "Full_MR_Results.tsv", sep = "\t", row.names = FALSE)
+write.table(full_results_df, file = "Liberal_Analysis/Full_MR_Results_Liberal.tsv", sep = "\t", row.names = FALSE)
