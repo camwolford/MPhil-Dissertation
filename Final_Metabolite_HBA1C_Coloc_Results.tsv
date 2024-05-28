@@ -1,0 +1,13 @@
+Metabolite	num_IVs	num_unconditioned_IVs	unconditional_pass	conditional_pass	Coloc_MR_Pass
+1-(1-enyl-palmitoyl)-2-arachidonoyl-GPE (P-16_0_20_4)*	3	0	FALSE	FALSE	FALSE
+1-arachidonoyl-GPA (20_4)	1	0	FALSE	FALSE	FALSE
+1-eicosapentaenoyl-GPC (20_5)*	2	0	FALSE	FALSE	FALSE
+1-linoleoyl-GPE (18_2)*	2	0	FALSE	FALSE	FALSE
+1-linoleoyl-GPI (18_2)*	2	0	FALSE	FALSE	FALSE
+1-palmitoyl-2-linoleoyl-GPE (16_0_18_2)	2	0	FALSE	FALSE	FALSE
+1-palmitoyl-2-linoleoyl-GPI (16_0_18_2)	1	0	FALSE	FALSE	FALSE
+1-palmitoyl-2-stearoyl-GPC (16_0_18_0)	2	0	FALSE	FALSE	FALSE
+2-linoleoyl-GPE (18_2)*	1	0	FALSE	FALSE	FALSE
+sphinganine	1	0	FALSE	FALSE	FALSE
+sphingomyelin (d18_2_14_0, d18_1_14_1)*	1	1	TRUE	TRUE	TRUE
+X - 11849	1	1	TRUE	TRUE	TRUE
