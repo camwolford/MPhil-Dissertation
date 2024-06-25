@@ -177,10 +177,22 @@ for (metabolite_file in metabolite_files) {
           metabolite_data$t2dm_SE[i] <- t2dm_values$SE
           metabolite_data$t2dm_EAF[i] <- t2dm_values$EAF
           metabolite_data$t2dm_Pval[i] <- t2dm_values$Pval
-          need_proxy <- need_proxy + 1
-          print("Proxy SNP")
-          proxy_found <- TRUE
-          break
+          if (metabolite_data$EffectAllele[i] == ld_proxies$A1[j] & metabolite_data$NonEffectAllele[i] == ld_proxies$A2[j]) {
+            need_proxy <- need_proxy + 1
+            print("Proxy SNP")
+            proxy_found <- TRUE
+            break
+          }
+          if (metabolite_data$EffectAllele[i] == ld_proxies$A2[j] & metabolite_data$NonEffectAllele[i] == ld_proxies$A1[j]) {
+            metabolite_data$proxy_EAF[i] <- metabolite_data$EAF[i]
+            # Switch the proxy alleles
+            metabolite_data$proxy_EffectAllele[i] <- ld_proxies$B2[j]
+            metabolite_data$proxy_NonEffectAllele[i] <- ld_proxies$B1[j]
+            need_proxy <- need_proxy + 1
+            print("Proxy SNP")
+            proxy_found <- TRUE
+            break
+          }
         }
         if (any(t2dm_data$Chromosome == ld_proxies$CHR_B[j] & t2dm_data$Position == ld_proxies$BP_B[j] &
                 t2dm_data$EffectAllele == ld_proxies$B2[j] & t2dm_data$NonEffectAllele == ld_proxies$B1[j])) {
@@ -199,10 +211,22 @@ for (metabolite_file in metabolite_files) {
           metabolite_data$t2dm_SE[i] <- t2dm_values$SE
           metabolite_data$t2dm_EAF[i] <- t2dm_values$EAF
           metabolite_data$t2dm_Pval[i] <- t2dm_values$Pval
-          need_proxy <- need_proxy + 1
-          print("Proxy SNP")
-          proxy_found <- TRUE
-          break
+          if (metabolite_data$EffectAllele[i] == ld_proxies$A1[j] & metabolite_data$NonEffectAllele[i] == ld_proxies$A2[j]) {
+            need_proxy <- need_proxy + 1
+            print("Proxy SNP")
+            proxy_found <- TRUE
+            break
+          }
+          if (metabolite_data$EffectAllele[i] == ld_proxies$A2[j] & metabolite_data$NonEffectAllele[i] == ld_proxies$A1[j]) {
+            metabolite_data$proxy_EAF[i] <- metabolite_data$EAF[i]
+            # Switch the proxy alleles
+            metabolite_data$proxy_EffectAllele[i] <- ld_proxies$B2[j]
+            metabolite_data$proxy_NonEffectAllele[i] <- ld_proxies$B1[j]
+            need_proxy <- need_proxy + 1
+            print("Proxy SNP")
+            proxy_found <- TRUE
+            break
+          }
         }
       }
     }
@@ -435,9 +459,22 @@ for (metabolite_file in metabolite_files) {
           metabolite_data$fg_EAF[i] <- fg_values$EAF
           metabolite_data$fg_Pval[i] <- fg_values$Pval
           need_proxy <- need_proxy + 1
-          print("Proxy SNP")
-          proxy_found <- TRUE
-          break
+          if (metabolite_data$EffectAllele[i] == ld_proxies$A1[j] & metabolite_data$NonEffectAllele[i] == ld_proxies$A2[j]) {
+            need_proxy <- need_proxy + 1
+            print("Proxy SNP")
+            proxy_found <- TRUE
+            break
+          }
+          if (metabolite_data$EffectAllele[i] == ld_proxies$A2[j] & metabolite_data$NonEffectAllele[i] == ld_proxies$A1[j]) {
+            metabolite_data$proxy_EAF[i] <- metabolite_data$EAF[i]
+            # Switch the proxy alleles
+            metabolite_data$proxy_EffectAllele[i] <- ld_proxies$B2[j]
+            metabolite_data$proxy_NonEffectAllele[i] <- ld_proxies$B1[j]
+            need_proxy <- need_proxy + 1
+            print("Proxy SNP")
+            proxy_found <- TRUE
+            break
+          }
         }
         if (any(fg_data$Chromosome == ld_proxies$CHR_B[j] & fg_data$Position == ld_proxies$BP_B[j] &
                 fg_data$EffectAllele == ld_proxies$B2[j] & fg_data$NonEffectAllele == ld_proxies$B1[j])) {
@@ -457,9 +494,22 @@ for (metabolite_file in metabolite_files) {
           metabolite_data$fg_EAF[i] <- fg_values$EAF
           metabolite_data$fg_Pval[i] <- fg_values$Pval
           need_proxy <- need_proxy + 1
-          print("Proxy SNP")
-          proxy_found <- TRUE
-          break
+          if (metabolite_data$EffectAllele[i] == ld_proxies$A1[j] & metabolite_data$NonEffectAllele[i] == ld_proxies$A2[j]) {
+            need_proxy <- need_proxy + 1
+            print("Proxy SNP")
+            proxy_found <- TRUE
+            break
+          }
+          if (metabolite_data$EffectAllele[i] == ld_proxies$A2[j] & metabolite_data$NonEffectAllele[i] == ld_proxies$A1[j]) {
+            metabolite_data$proxy_EAF[i] <- metabolite_data$EAF[i]
+            # Switch the proxy alleles
+            metabolite_data$proxy_EffectAllele[i] <- ld_proxies$B2[j]
+            metabolite_data$proxy_NonEffectAllele[i] <- ld_proxies$B1[j]
+            need_proxy <- need_proxy + 1
+            print("Proxy SNP")
+            proxy_found <- TRUE
+            break
+          }
         }
       }
     }
@@ -699,10 +749,22 @@ for (metabolite_file in metabolite_files) {
           metabolite_data$hba1c_SE[i] <- hba1c_values$SE
           metabolite_data$hba1c_EAF[i] <- hba1c_values$EAF
           metabolite_data$hba1c_Pval[i] <- hba1c_values$Pval
-          need_proxy <- need_proxy + 1
-          print("Proxy SNP")
-          proxy_found <- TRUE
-          break
+          if (metabolite_data$EffectAllele[i] == ld_proxies$A1[j] & metabolite_data$NonEffectAllele[i] == ld_proxies$A2[j]) {
+            need_proxy <- need_proxy + 1
+            print("Proxy SNP")
+            proxy_found <- TRUE
+            break
+          }
+          if (metabolite_data$EffectAllele[i] == ld_proxies$A2[j] & metabolite_data$NonEffectAllele[i] == ld_proxies$A1[j]) {
+            metabolite_data$proxy_EAF[i] <- metabolite_data$EAF[i]
+            # Switch the proxy alleles
+            metabolite_data$proxy_EffectAllele[i] <- ld_proxies$B2[j]
+            metabolite_data$proxy_NonEffectAllele[i] <- ld_proxies$B1[j]
+            need_proxy <- need_proxy + 1
+            print("Proxy SNP")
+            proxy_found <- TRUE
+            break
+          }
         }
         if (any(hba1c_data$Chromosome == ld_proxies$CHR_B[j] & hba1c_data$Position == ld_proxies$BP_B[j] &
                 hba1c_data$EffectAllele == ld_proxies$B2[j] & hba1c_data$NonEffectAllele == ld_proxies$B1[j])) {
@@ -721,10 +783,22 @@ for (metabolite_file in metabolite_files) {
           metabolite_data$hba1c_SE[i] <- hba1c_values$SE
           metabolite_data$hba1c_EAF[i] <- hba1c_values$EAF
           metabolite_data$hba1c_Pval[i] <- hba1c_values$Pval
-          need_proxy <- need_proxy + 1
-          print("Proxy SNP")
-          proxy_found <- TRUE
-          break
+          if (metabolite_data$EffectAllele[i] == ld_proxies$A1[j] & metabolite_data$NonEffectAllele[i] == ld_proxies$A2[j]) {
+            need_proxy <- need_proxy + 1
+            print("Proxy SNP")
+            proxy_found <- TRUE
+            break
+          }
+          if (metabolite_data$EffectAllele[i] == ld_proxies$A2[j] & metabolite_data$NonEffectAllele[i] == ld_proxies$A1[j]) {
+            metabolite_data$proxy_EAF[i] <- metabolite_data$EAF[i]
+            # Switch the proxy alleles
+            metabolite_data$proxy_EffectAllele[i] <- ld_proxies$B2[j]
+            metabolite_data$proxy_NonEffectAllele[i] <- ld_proxies$B1[j]
+            need_proxy <- need_proxy + 1
+            print("Proxy SNP")
+            proxy_found <- TRUE
+            break
+          }
         }
       }
     }

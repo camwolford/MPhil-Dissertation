@@ -466,8 +466,20 @@ clumped_ivs <- bind_rows(clumped_waist_ivs, clumped_smoke_ivs, clumped_mpv_ivs, 
                          clumped_ApoB_ivs, clumped_crp_ivs, clumped_rbc_ivs)
 # Keep only the rows with unique variants
 clumped_ivs <- clumped_ivs %>% distinct(variant, .keep_all = TRUE)
-# Remove columns 2,3,4,5,7-16
-clumped_ivs <- clumped_ivs[, -c(2:5, 7:16)]
+# Remove columns
+clumped_ivs <- clumped_ivs[, -c(2, 3, 9, 10, 14, 15, 16)]
+# Prepare for alignment
+clumped_ivs$effect_allele <- clumped_ivs$alt
+clumped_ivs$noneffect_allele <- clumped_ivs$ref
+clumped_ivs$eaf <- NA
+for (i in 1:nrow(clumped_ivs)) {
+  if (clumped_ivs$effect_allele[i] == clumped_ivs$minor_allele[i]) {
+    clumped_ivs$eaf[i] <- clumped_ivs$minor_AF[i]
+  } else {
+    clumped_ivs$eaf[i] <- 1 - clumped_ivs$minor_AF[i]
+  }
+}
+clumped_ivs <- clumped_ivs[, -c(2, 3, 5, 6)]
 
 # Remove the ukbb_variants_data
 rm(ukbb_variants_data)
@@ -498,7 +510,7 @@ for (subpathway in subpathways) {
   assign(paste0("unique_variants_", subpathway), clumped_ivs)
   
   # Collect the metabolites in the subpathway
-  metabolites <- metabolites_data_frame$name[subpathways == subpathway]
+  metabolites <- metabolites_data_frame$name[metabolites_data_frame$subpathway == subpathway]
   
   for (metabolite in metabolites) {
     # Select the rows in pwcoco_coloc_out that contain the metabolite
@@ -532,21 +544,25 @@ for (subpathway in subpathways) {
     # Remove the variants in variants_to_remove from the metabolite_data
     metabolite_data <- metabolite_data %>% filter(!SNP %in% variants_to_remove)
     
-    # Change _ to : in the MarkerName column
-    metabolite_data$MarkerName <- str_replace_all(metabolite_data$MarkerName, "_", ":")
-    # Remove "chr" from the MarkerName column
-    metabolite_data$MarkerName <- str_replace_all(metabolite_data$MarkerName, "chr", "")
+    # Make a variant column by doing this paste0("chr"Chromosome:Position:NonEffectAllele:EffectAllele)
+    metabolite_data$variant <- paste0("chr", metabolite_data$Chromosome, ":", metabolite_data$Position, ":", metabolite_data$NonEffectAllele, ":", metabolite_data$EffectAllele)
     
-    # Remove columns 1,2,5-25
-    metabolite_data <- metabolite_data[, -c(1, 2, 5:25)]
-    # Change the column names to be the same as clumped_ivs
-    colnames(metabolite_data) <- colnames(clumped_ivs)
+    metabolite_data_ordered <- data.frame(
+      variant = metabolite_data$variant,
+      rsid = metabolite_data$SNP,
+      beta = -metabolite_data$Beta, # Negative beta due to allele flipping
+      se = metabolite_data$SE,
+      pval = metabolite_data$Pval,
+      effect_allele = metabolite_data$EffectAllele,
+      noneffect_allele = metabolite_data$NonEffectAllele,
+      eaf = metabolite_data$EAF
+    )
 
     # Get current unique variants dataframe
     current_variants <- get(paste0("unique_variants_", subpathway))
     
     # Add the IVs to the {pathway}_unique_variants
-    new_variants <- rbind(current_variants, metabolite_data)
+    new_variants <- rbind(current_variants, metabolite_data_ordered)
     
     # Assign back the updated unique variants
     assign(paste0("unique_variants_", subpathway), new_variants)
@@ -566,3 +582,4 @@ for (subpathway in subpathways) {
 all_possible_variants <- all_possible_variants %>% distinct()
 # Save the all possible variants to a tsv file
 write_tsv(data.frame(variant = all_possible_variants), "Mediation/all_possible_variants.tsv")
+

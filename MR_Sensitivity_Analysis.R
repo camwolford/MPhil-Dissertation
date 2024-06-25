@@ -80,59 +80,59 @@ for (metabolite in sig_results$Metabolite) {
     metabolite_T2DM_Sensitivity_Analysis[metabolite_T2DM_Sensitivity_Analysis$Metabolite == metabolite, "Direction_Flag"] <- direction_results$correct_causal_direction
     metabolite_T2DM_Sensitivity_Analysis[metabolite_T2DM_Sensitivity_Analysis$Metabolite == metabolite, "Steiger_Pval"] <- direction_results$steiger_pval
 
-    if (metabolite_results$Number_of_IVs_T2DM > 3) {
+    #if (metabolite_results$Number_of_IVs_T2DM > 3) {
       # Perform MR PRESSO
-      mr_presso_data <- data.frame(BetaOutcome = metabolite_data$t2dm_Beta, BetaExposure = metabolite_data$Beta, SdOutcome = metabolite_data$t2dm_SE, 
-                                   SdExposure = metabolite_data$SE)
-      tryCatch(
-        {
-        mr_presso_results <- mr_presso(BetaOutcome = "BetaOutcome", BetaExposure = "BetaExposure", SdOutcome = "SdOutcome", 
-                                       SdExposure = "SdExposure", OUTLIERtest = TRUE, DISTORTIONtest = TRUE, 
-                                       data = mr_presso_data, NbDistribution = 1000,  SignifThreshold = 0.05)
-        metabolite_T2DM_Sensitivity_Analysis[metabolite_T2DM_Sensitivity_Analysis$Metabolite == metabolite, "MR_PRESSO_Global_Pval"] <- mr_presso_results$`MR-PRESSO results`$`Global Test`$Pvalue
+      #mr_presso_data <- data.frame(BetaOutcome = metabolite_data$t2dm_Beta, BetaExposure = metabolite_data$Beta, SdOutcome = metabolite_data$t2dm_SE, 
+                                   #SdExposure = metabolite_data$SE)
+      #tryCatch(
+        #{
+        #mr_presso_results <- mr_presso(BetaOutcome = "BetaOutcome", BetaExposure = "BetaExposure", SdOutcome = "SdOutcome", 
+                                       #SdExposure = "SdExposure", OUTLIERtest = TRUE, DISTORTIONtest = TRUE, 
+                                       #data = mr_presso_data, NbDistribution = 1000,  SignifThreshold = 0.05)
+        #metabolite_T2DM_Sensitivity_Analysis[metabolite_T2DM_Sensitivity_Analysis$Metabolite == metabolite, "MR_PRESSO_Global_Pval"] <- mr_presso_results$`MR-PRESSO results`$`Global Test`$Pvalue
         # Make a character string of the outlier indices
-        metabolite_T2DM_Sensitivity_Analysis[metabolite_T2DM_Sensitivity_Analysis$Metabolite == metabolite, "MR_PRESSO_Outlier_Indices"] <- paste(mr_presso_results$`MR-PRESSO results`$`Distortion Test`$`Outliers Indices`, collapse = ",")
-        metabolite_T2DM_Sensitivity_Analysis[metabolite_T2DM_Sensitivity_Analysis$Metabolite == metabolite, "MR_PRESSO_Outlier_Pvals"] <- mr_presso_results$`MR-PRESSO results`$`Distortion Test`$Pvalue
-        }, error = function(e) {
+        #metabolite_T2DM_Sensitivity_Analysis[metabolite_T2DM_Sensitivity_Analysis$Metabolite == metabolite, "MR_PRESSO_Outlier_Indices"] <- paste(mr_presso_results$`MR-PRESSO results`$`Distortion Test`$`Outliers Indices`, collapse = ",")
+        #metabolite_T2DM_Sensitivity_Analysis[metabolite_T2DM_Sensitivity_Analysis$Metabolite == metabolite, "MR_PRESSO_Outlier_Pvals"] <- mr_presso_results$`MR-PRESSO results`$`Distortion Test`$Pvalue
+        #}, error = function(e) {
           # pass
-        })
+        #})
       # Perform MR RAPS
-      mr_raps_results <-mr.raps(mr_presso_data$BetaExposure, mr_presso_data$BetaOutcome, mr_presso_data$SdExposure, mr_presso_data$SdOutcome)
-      metabolite_T2DM_Sensitivity_Analysis[metabolite_T2DM_Sensitivity_Analysis$Metabolite == metabolite, "MR_RAPS_Beta"] <- mr_raps_results$beta.hat
-      metabolite_T2DM_Sensitivity_Analysis[metabolite_T2DM_Sensitivity_Analysis$Metabolite == metabolite, "MR_RAPS_SE"] <- mr_raps_results$beta.se
-      metabolite_T2DM_Sensitivity_Analysis[metabolite_T2DM_Sensitivity_Analysis$Metabolite == metabolite, "MR_RAPS_Pval"] <- mr_raps_results$beta.p.value
-    } else {
+      #mr_raps_results <-mr.raps(mr_presso_data$BetaExposure, mr_presso_data$BetaOutcome, mr_presso_data$SdExposure, mr_presso_data$SdOutcome)
+      #metabolite_T2DM_Sensitivity_Analysis[metabolite_T2DM_Sensitivity_Analysis$Metabolite == metabolite, "MR_RAPS_Beta"] <- mr_raps_results$beta.hat
+      #metabolite_T2DM_Sensitivity_Analysis[metabolite_T2DM_Sensitivity_Analysis$Metabolite == metabolite, "MR_RAPS_SE"] <- mr_raps_results$beta.se
+      #metabolite_T2DM_Sensitivity_Analysis[metabolite_T2DM_Sensitivity_Analysis$Metabolite == metabolite, "MR_RAPS_Pval"] <- mr_raps_results$beta.p.value
+    #} else {
       # Check the number of IVs in the liberal results for the metabolite
-      tryCatch({
-        if (Liberal_results[Liberal_results$Metabolite == metabolite,]$Number_of_IVs_T2DM > 3) {
-          liberal_metabolite_file <- Liberal_T2DM_files[str_detect(Liberal_T2DM_files, fixed(metabolite, ignore_case = TRUE))]
-          liberal_metabolite_data <- readr::read_tsv(liberal_metabolite_file)
+      #tryCatch({
+        #if (Liberal_results[Liberal_results$Metabolite == metabolite,]$Number_of_IVs_T2DM > 3) {
+          #liberal_metabolite_file <- Liberal_T2DM_files[str_detect(Liberal_T2DM_files, fixed(metabolite, ignore_case = TRUE))]
+          #liberal_metabolite_data <- readr::read_tsv(liberal_metabolite_file)
           # Perform MR PRESSO
-          mr_presso_data <- data.frame(BetaOutcome = metabolite_data$t2dm_Beta, BetaExposure = metabolite_data$Beta, SdOutcome = metabolite_data$t2dm_SE, 
-                                     SdExposure = metabolite_data$SE)
-          tryCatch(
-            {
-            mr_presso_results <- mr_presso(BetaOutcome = "BetaOutcome", BetaExposure = "BetaExposure", SdOutcome = "SdOutcome", 
-                                         SdExposure = "SdExposure", OUTLIERtest = TRUE, DISTORTIONtest = TRUE, 
-                                         data = mr_presso_data, NbDistribution = 1000,  SignifThreshold = 0.05)
-            metabolite_T2DM_Sensitivity_Analysis[metabolite_T2DM_Sensitivity_Analysis$Metabolite == metabolite, "MR_PRESSO_Global_Pval"] <- mr_presso_results$`MR-PRESSO results`$`Global Test`$Pvalue
+          #mr_presso_data <- data.frame(BetaOutcome = metabolite_data$t2dm_Beta, BetaExposure = metabolite_data$Beta, SdOutcome = metabolite_data$t2dm_SE, 
+                                     #SdExposure = metabolite_data$SE)
+          #tryCatch(
+            #{
+            #mr_presso_results <- mr_presso(BetaOutcome = "BetaOutcome", BetaExposure = "BetaExposure", SdOutcome = "SdOutcome", 
+                                         #SdExposure = "SdExposure", OUTLIERtest = TRUE, DISTORTIONtest = TRUE, 
+                                         #data = mr_presso_data, NbDistribution = 1000,  SignifThreshold = 0.05)
+            #metabolite_T2DM_Sensitivity_Analysis[metabolite_T2DM_Sensitivity_Analysis$Metabolite == metabolite, "MR_PRESSO_Global_Pval"] <- mr_presso_results$`MR-PRESSO results`$`Global Test`$Pvalue
             # Make a character string of the outlier indices
-            metabolite_T2DM_Sensitivity_Analysis[metabolite_T2DM_Sensitivity_Analysis$Metabolite == metabolite, "MR_PRESSO_Outlier_Indices"] <- paste(mr_presso_results$`MR-PRESSO results`$`Distortion Test`$`Outliers Indices`, collapse = ",")
-            metabolite_T2DM_Sensitivity_Analysis[metabolite_T2DM_Sensitivity_Analysis$Metabolite == metabolite, "MR_PRESSO_Outlier_Pvals"] <- mr_presso_results$`MR-PRESSO results`$`Distortion Test`$Pvalue
-            }, error = function(e) {
+            #metabolite_T2DM_Sensitivity_Analysis[metabolite_T2DM_Sensitivity_Analysis$Metabolite == metabolite, "MR_PRESSO_Outlier_Indices"] <- paste(mr_presso_results$`MR-PRESSO results`$`Distortion Test`$`Outliers Indices`, collapse = ",")
+            #metabolite_T2DM_Sensitivity_Analysis[metabolite_T2DM_Sensitivity_Analysis$Metabolite == metabolite, "MR_PRESSO_Outlier_Pvals"] <- mr_presso_results$`MR-PRESSO results`$`Distortion Test`$Pvalue
+            #}, error = function(e) {
               # pass
-            })
+            #})
           # Perform MR RAPS
-          mr_raps_results <-mr.raps(mr_presso_data$BetaExposure, mr_presso_data$BetaOutcome, mr_presso_data$SdExposure, mr_presso_data$SdOutcome)
-          metabolite_T2DM_Sensitivity_Analysis[metabolite_T2DM_Sensitivity_Analysis$Metabolite == metabolite, "MR_RAPS_Beta"] <- mr_raps_results$beta.hat
-          metabolite_T2DM_Sensitivity_Analysis[metabolite_T2DM_Sensitivity_Analysis$Metabolite == metabolite, "MR_RAPS_SE"] <- mr_raps_results$beta.se
-          metabolite_T2DM_Sensitivity_Analysis[metabolite_T2DM_Sensitivity_Analysis$Metabolite == metabolite, "MR_RAPS_Pval"] <- mr_raps_results$beta.p.value
-          metabolite_T2DM_Sensitivity_Analysis[metabolite_T2DM_Sensitivity_Analysis$Metabolite == metabolite, "Liberal_Flag"] <- TRUE
-        }
-        }, error = function(e) {
+          #mr_raps_results <-mr.raps(mr_presso_data$BetaExposure, mr_presso_data$BetaOutcome, mr_presso_data$SdExposure, mr_presso_data$SdOutcome)
+          #metabolite_T2DM_Sensitivity_Analysis[metabolite_T2DM_Sensitivity_Analysis$Metabolite == metabolite, "MR_RAPS_Beta"] <- mr_raps_results$beta.hat
+          #metabolite_T2DM_Sensitivity_Analysis[metabolite_T2DM_Sensitivity_Analysis$Metabolite == metabolite, "MR_RAPS_SE"] <- mr_raps_results$beta.se
+          #metabolite_T2DM_Sensitivity_Analysis[metabolite_T2DM_Sensitivity_Analysis$Metabolite == metabolite, "MR_RAPS_Pval"] <- mr_raps_results$beta.p.value
+          #metabolite_T2DM_Sensitivity_Analysis[metabolite_T2DM_Sensitivity_Analysis$Metabolite == metabolite, "Liberal_Flag"] <- TRUE
+        #}
+        #}, error = function(e) {
           # pass
-        })
-      }
+        #})
+      #}
     counter <- counter + 1
     print(paste0("Processed ", counter, " metabolite-T2DM associations"))
   }
@@ -246,7 +246,7 @@ for (metabolite in sig_results$Metabolite) {
       metabolite_FG_Sensitivity_Analysis[metabolite_FG_Sensitivity_Analysis$Metabolite == metabolite, "MR_RAPS_SE"] <- mr_raps_results$beta.se
       metabolite_FG_Sensitivity_Analysis[metabolite_FG_Sensitivity_Analysis$Metabolite == metabolite, "MR_RAPS_Pval"] <- mr_raps_results$beta.p.value
     } else {
-      # Check the number of IVs in the liberal results for the metabolite
+       # Check the number of IVs in the liberal results for the metabolite
       tryCatch({
         if (Liberal_results[Liberal_results$Metabolite == metabolite,]$Number_of_IVs_FG > 3) {
           liberal_metabolite_file <- Liberal_FG_files[str_detect(Liberal_FG_files, fixed(metabolite, ignore_case = TRUE))]

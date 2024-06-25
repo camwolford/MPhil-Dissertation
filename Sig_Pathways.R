@@ -29,8 +29,14 @@ metabolite_SNPs <- data.frame(name = sig_metabolites, T2DM_SNPs = NA, FG_SNPs = 
 
 # For each sig_metabolite, retrieve the snps used
 T2DM_files <- list.files("Harmonised_T2DM_IVs", full.names = TRUE)
+# Remove files with ~
+T2DM_files <- T2DM_files[!grepl("~", T2DM_files)]
 FG_files <- list.files("Harmonised_FG_IVs", full.names = TRUE)
+# Remove files with ~
+FG_files <- FG_files[!grepl("~", FG_files)]
 HBA1C_files <- list.files("Harmonised_HBA1C_IVs", full.names = TRUE)
+# Remove files with ~
+HBA1C_files <- HBA1C_files[!grepl("~", HBA1C_files)]
 
 for (metabolite_file in T2DM_files) {
   # Read in the file 

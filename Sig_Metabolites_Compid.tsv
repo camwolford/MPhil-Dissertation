@@ -11,6 +11,7 @@ name	compid
 1-dihomo-linoleoyl-GPC (20:2)*	M33871
 1-eicosapentaenoyl-GPC (20:5)*	M44563
 1-eicosapentaenoyl-GPE (20:5)*	M47888
+1-eicosenoyl-GPC (20:1)*	M44560
 1-linoleoyl-2-arachidonoyl-GPC (18:2/20:4n6)*	M52710
 1-linoleoyl-GPE (18:2)*	M36600
 1-linoleoyl-GPI (18:2)*	M36594
@@ -62,7 +63,6 @@ tyrosine	M01299
 X - 11441	M46360
 X - 11442	M46443
 X - 11849	M46607
-X - 12339	M47709
 X - 16946	M46517
 X - 18886	M48047
 X - 21792	M46968
