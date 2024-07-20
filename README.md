@@ -1,8 +1,8 @@
-# Dissertation Analysis Scripts
+# MPhil in Genomic Medicine Dissertation Scripts
 
 ## Overview
 
-This repository contains the most relevant scripts used for the data analysis in my dissertation. These scripts include the pertinent functions discussed in the Materials and Methods section of my dissertation. Please note that while these are the primary scripts used, they do not represent the entirety of the code utilised in the analysis.
+This repository contains the most relevant scripts used for the data analysis in my MPhil in Genomic Medicine Dissertation. These scripts include the pertinent functions discussed in the Materials and Methods section of my dissertation. Please note that while these are the primary scripts used, they do not represent the entirety of the code utilised in the analysis.
 
 ## Contents
 
